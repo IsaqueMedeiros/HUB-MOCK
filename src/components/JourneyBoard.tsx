@@ -27,11 +27,7 @@ import {
   Edit,
   RefreshCw,
   Download,
-  Settings,
-  ChevronDown,
-  BarChart3,
-  Zap,
-  X
+  Settings
 } from 'lucide-react';
 
 interface JourneyBoardProps {
@@ -299,7 +295,6 @@ export default function JourneyBoard({ selectedDealId }: JourneyBoardProps) {
   const [filters, setFilters] = useState<FilterState>({ search: '' });
   const [viewMode, setViewMode] = useState<'board' | 'list'>('board');
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const formatCurrency = (amount: string | number) => {
     const num = typeof amount === 'string' ? parseFloat(amount) : amount;
@@ -320,26 +315,19 @@ export default function JourneyBoard({ selectedDealId }: JourneyBoardProps) {
   };
 
   const getHealthScoreColor = (score: number) => {
-    if (score >= 90) return 'text-emerald-700 bg-emerald-50 border-emerald-200 ring-emerald-100';
-    if (score >= 70) return 'text-blue-700 bg-blue-50 border-blue-200 ring-blue-100';
-    if (score >= 50) return 'text-amber-700 bg-amber-50 border-amber-200 ring-amber-100';
-    return 'text-red-700 bg-red-50 border-red-200 ring-red-100';
+    if (score >= 90) return 'text-green-600 bg-green-100';
+    if (score >= 70) return 'text-blue-600 bg-blue-100';
+    if (score >= 50) return 'text-yellow-600 bg-yellow-100';
+    return 'text-red-600 bg-red-100';
   };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'high': return 'bg-gradient-to-r from-red-500 to-pink-500 shadow-red-200';
-      case 'medium': return 'bg-gradient-to-r from-yellow-400 to-orange-500 shadow-yellow-200';
-      case 'low': return 'bg-gradient-to-r from-green-400 to-emerald-500 shadow-green-200';
-      default: return 'bg-gradient-to-r from-gray-400 to-gray-500 shadow-gray-200';
+      case 'high': return 'bg-red-500';
+      case 'medium': return 'bg-yellow-500';
+      case 'low': return 'bg-green-500';
+      default: return 'bg-gray-500';
     }
-  };
-
-  const handleRefresh = async () => {
-    setIsRefreshing(true);
-    // Simular carregamento
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    setIsRefreshing(false);
   };
 
   const organizeDataByStage = (): StageColumn[] => {
@@ -347,9 +335,9 @@ export default function JourneyBoard({ selectedDealId }: JourneyBoardProps) {
       {
         stage: 'prospeccao',
         title: 'Prospecção',
-        description: 'Leads em processo de qualificação e proposta',
+        description: 'Clientes em processo de apresentação e proposta',
         color: 'text-blue-700',
-        bgColor: 'bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-700',
+        bgColor: 'bg-gradient-to-br from-blue-500 to-blue-600',
         borderColor: 'border-blue-200',
         icon: <Target className="h-6 w-6" />,
         clients: [],
@@ -358,9 +346,9 @@ export default function JourneyBoard({ selectedDealId }: JourneyBoardProps) {
       {
         stage: 'onboarding',
         title: 'Onboarding',
-        description: 'Clientes com contratos fechados em processo de ativação',
+        description: 'Clientes com contrato enviado ou fechado',
         color: 'text-amber-700',
-        bgColor: 'bg-gradient-to-br from-amber-500 via-orange-500 to-red-500',
+        bgColor: 'bg-gradient-to-br from-amber-500 to-orange-500',
         borderColor: 'border-amber-200',
         icon: <Briefcase className="h-6 w-6" />,
         clients: [],
@@ -369,9 +357,9 @@ export default function JourneyBoard({ selectedDealId }: JourneyBoardProps) {
       {
         stage: 'relacionamento',
         title: 'Relacionamento',
-        description: 'Clientes ativos com gestão contínua de portfolio',
+        description: 'Clientes ativos com cadência de contato',
         color: 'text-emerald-700',
-        bgColor: 'bg-gradient-to-br from-emerald-500 via-green-500 to-teal-600',
+        bgColor: 'bg-gradient-to-br from-emerald-500 to-green-500',
         borderColor: 'border-emerald-200',
         icon: <Users className="h-6 w-6" />,
         clients: [],
@@ -417,157 +405,105 @@ export default function JourneyBoard({ selectedDealId }: JourneyBoardProps) {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+      <div className="flex items-center justify-center min-h-screen bg-gray-50">
         <div className="text-center">
-          <div className="relative">
-            <div className="w-20 h-20 border-4 border-blue-200 rounded-full animate-spin mx-auto mb-6">
-              <div className="absolute top-0 left-0 w-20 h-20 border-4 border-transparent border-t-blue-600 rounded-full animate-spin"></div>
-            </div>
-            <div className="absolute inset-0 flex items-center justify-center">
-              <TrendingUp className="h-8 w-8 text-blue-600 animate-pulse" />
-            </div>
-          </div>
-          <p className="text-gray-700 text-xl font-semibold mb-2">Carregando Dashboard</p>
-          <p className="text-gray-500">Sincronizando dados da jornada...</p>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600 text-lg">Carregando jornada dos clientes...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="backdrop-blur-xl bg-white/90 border-b border-white/20 shadow-lg sticky top-0 z-50">
+      <header className="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-40">
         <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20">
-            {/* Logo e Título */}
+          <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-4">
-                <div className="relative">
-                  <div className="w-12 h-12 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 rounded-2xl flex items-center justify-center shadow-xl transform rotate-3 hover:rotate-0 transition-transform duration-300">
-                    <TrendingUp className="h-7 w-7 text-white" />
-                  </div>
-                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-400 rounded-full border-2 border-white animate-pulse"></div>
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-red-500 rounded-xl flex items-center justify-center shadow-lg">
+                  <TrendingUp className="h-6 w-6 text-white" />
                 </div>
                 <div>
-                  <h1 className="text-3xl font-black bg-gradient-to-r from-gray-900 via-blue-800 to-indigo-800 bg-clip-text text-transparent">
-                    Journey Board
-                  </h1>
-                  <p className="text-sm text-gray-600 font-medium">
-                    CRM Analytics • <span className="text-blue-600">HubSpot Integration</span>
-                  </p>
+                  <h1 className="text-2xl font-bold text-gray-900">Journey Board</h1>
+                  <p className="text-sm text-gray-500">CRM Analytics • HubSpot Integration</p>
                 </div>
               </div>
             </div>
             
-            {/* Stats Cards */}
-            <div className="hidden lg:flex items-center space-x-6">
-              <div className="bg-white/70 backdrop-blur-sm rounded-2xl px-6 py-4 border border-white/30 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+            <div className="flex items-center space-x-4">
+              <div className="hidden lg:flex items-center space-x-6 text-sm">
                 <div className="text-center">
-                  <div className="flex items-center justify-center space-x-2 mb-1">
-                    <Users className="h-5 w-5 text-blue-600" />
-                    <p className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                      {totalClients}
-                    </p>
-                  </div>
-                  <p className="text-gray-600 font-medium text-sm">Clientes Ativos</p>
+                  <p className="text-2xl font-bold text-gray-900">{totalClients}</p>
+                  <p className="text-gray-500">Clientes</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-green-600">{formatCurrency(totalValue)}</p>
+                  <p className="text-gray-500">Pipeline</p>
                 </div>
               </div>
               
-              <div className="bg-white/70 backdrop-blur-sm rounded-2xl px-6 py-4 border border-white/30 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-                <div className="text-center">
-                  <div className="flex items-center justify-center space-x-2 mb-1">
-                    <DollarSign className="h-5 w-5 text-emerald-600" />
-                    <p className="text-3xl font-bold bg-gradient-to-r from-emerald-600 to-green-600 bg-clip-text text-transparent">
-                      {formatCurrency(totalValue).replace('R$', '').trim()}
-                    </p>
-                  </div>
-                  <p className="text-gray-600 font-medium text-sm">Pipeline Total</p>
-                </div>
+              <div className="flex items-center space-x-2">
+                <button className="hidden md:flex items-center space-x-2 px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
+                  <Download className="h-4 w-4" />
+                  <span>Exportar</span>
+                </button>
+                <button className="flex items-center space-x-2 px-3 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                  <RefreshCw className="h-4 w-4" />
+                  <span className="hidden sm:inline">Atualizar</span>
+                </button>
               </div>
-            </div>
-            
-            {/* Action Buttons */}
-            <div className="flex items-center space-x-3">
-              <button className="hidden md:flex items-center space-x-2 px-4 py-2.5 text-sm bg-white/70 backdrop-blur-sm text-gray-700 rounded-xl border border-white/30 hover:bg-white hover:shadow-lg transition-all duration-300 hover:scale-105">
-                <Download className="h-4 w-4" />
-                <span>Exportar</span>
-              </button>
-              
-              <button 
-                onClick={handleRefresh}
-                disabled={isRefreshing}
-                className="flex items-center space-x-2 px-4 py-2.5 text-sm bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl disabled:opacity-50"
-              >
-                <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-                <span className="hidden sm:inline">
-                  {isRefreshing ? 'Sincronizando...' : 'Atualizar'}
-                </span>
-              </button>
             </div>
           </div>
         </div>
       </header>
 
       {/* Filters */}
-      <div className="backdrop-blur-xl bg-white/80 border-b border-white/20 shadow-sm">
-        <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div className="bg-white border-b border-gray-200">
+        <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
-            {/* Search */}
             <div className="flex items-center space-x-4">
-              <div className="relative group">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 group-hover:text-blue-500 transition-colors" />
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <input
                   type="text"
-                  placeholder="Buscar clientes, empresas..."
+                  placeholder="Buscar clientes..."
                   value={filters.search}
                   onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-                  className="pl-12 pr-4 py-3.5 border-2 border-white/30 bg-white/70 backdrop-blur-sm rounded-2xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-300 w-full sm:w-96 text-gray-700 placeholder-gray-500 shadow-lg hover:shadow-xl"
+                  className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full sm:w-80"
                 />
-                {filters.search && (
-                  <button
-                    onClick={() => setFilters({ ...filters, search: '' })}
-                    className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-                )}
               </div>
             </div>
             
-            {/* Filter Controls */}
             <div className="flex items-center space-x-3">
               <select
                 value={filters.stage || ''}
                 onChange={(e) => setFilters({ ...filters, stage: e.target.value as JourneyStage || undefined })}
-                className="px-4 py-3 border-2 border-white/30 bg-white/70 backdrop-blur-sm rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 text-sm font-medium text-gray-700 shadow-lg hover:shadow-xl transition-all duration-300"
+                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
               >
-                <option value="">🎯 Todas as etapas</option>
-                <option value="prospeccao">🔍 Prospecção</option>
-                <option value="onboarding">📋 Onboarding</option>
-                <option value="relacionamento">🤝 Relacionamento</option>
+                <option value="">Todas as etapas</option>
+                <option value="prospeccao">Prospecção</option>
+                <option value="onboarding">Onboarding</option>
+                <option value="relacionamento">Relacionamento</option>
               </select>
               
               <select
                 value={filters.priority || ''}
                 onChange={(e) => setFilters({ ...filters, priority: e.target.value as any || undefined })}
-                className="px-4 py-3 border-2 border-white/30 bg-white/70 backdrop-blur-sm rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 text-sm font-medium text-gray-700 shadow-lg hover:shadow-xl transition-all duration-300"
+                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
               >
-                <option value="">⚡ Todas as prioridades</option>
-                <option value="high">🔴 Alta prioridade</option>
-                <option value="medium">🟡 Média prioridade</option>
-                <option value="low">🟢 Baixa prioridade</option>
+                <option value="">Todas as prioridades</option>
+                <option value="high">Alta prioridade</option>
+                <option value="medium">Média prioridade</option>
+                <option value="low">Baixa prioridade</option>
               </select>
               
               <button
                 onClick={() => setViewMode(viewMode === 'board' ? 'list' : 'board')}
-                className="p-3 border-2 border-white/30 bg-white/70 backdrop-blur-sm rounded-xl hover:bg-white hover:border-blue-300 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
-                title={viewMode === 'board' ? 'Visualização em Lista' : 'Visualização em Board'}
+                className="p-2 border border-gray-300 rounded-lg hover:bg-gray-50"
               >
-                {viewMode === 'board' ? 
-                  <BarChart3 className="h-5 w-5 text-gray-600" /> : 
-                  <Target className="h-5 w-5 text-gray-600" />
-                }
+                {viewMode === 'board' ? <Activity className="h-4 w-4" /> : <Target className="h-4 w-4" />}
               </button>
             </div>
           </div>
@@ -575,31 +511,24 @@ export default function JourneyBoard({ selectedDealId }: JourneyBoardProps) {
       </div>
 
       {/* Main Content */}
-      <main className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {viewMode === 'board' ? (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {stageColumns.map((column, index) => (
-              <div
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {stageColumns.map((column) => (
+              <StageColumn 
                 key={column.stage}
-                className="animate-fade-in-up"
-                style={{ animationDelay: `${index * 150}ms` }}
-              >
-                <StageColumn 
-                  column={column}
-                  onClientSelect={setSelectedClient}
-                  selectedClientId={selectedClient?.dealId}
-                />
-              </div>
+                column={column}
+                onClientSelect={setSelectedClient}
+                selectedClientId={selectedClient?.dealId}
+              />
             ))}
           </div>
         ) : (
-          <div className="animate-fade-in">
-            <ClientListView 
-              clients={journeyData}
-              onClientSelect={setSelectedClient}
-              selectedClientId={selectedClient?.dealId}
-            />
-          </div>
+          <ClientListView 
+            clients={journeyData}
+            onClientSelect={setSelectedClient}
+            selectedClientId={selectedClient?.dealId}
+          />
         )}
       </main>
 
@@ -610,38 +539,6 @@ export default function JourneyBoard({ selectedDealId }: JourneyBoardProps) {
           onClose={() => setSelectedClient(null)} 
         />
       )}
-
-      {/* Custom Styles */}
-      <style jsx>{`
-        @keyframes fade-in-up {
-          from {
-            opacity: 0;
-            transform: translateY(30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        
-        @keyframes fade-in {
-          from {
-            opacity: 0;
-          }
-          to {
-            opacity: 1;
-          }
-        }
-        
-        .animate-fade-in-up {
-          animation: fade-in-up 0.6s ease-out forwards;
-          opacity: 0;
-        }
-        
-        .animate-fade-in {
-          animation: fade-in 0.4s ease-out forwards;
-        }
-      `}</style>
     </div>
   );
 }
@@ -657,40 +554,33 @@ function StageColumn({ column, onClientSelect, selectedClientId }: StageColumnPr
   const progressPercentage = column.targetCount ? (column.clients.length / column.targetCount) * 100 : 0;
   
   return (
-    <div className="group relative bg-white/90 backdrop-blur-xl rounded-3xl shadow-xl overflow-hidden border border-white/20 hover:shadow-2xl transition-all duration-500 hover:scale-[1.02] hover:bg-white">
+    <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100 hover:shadow-xl transition-shadow duration-300">
       {/* Column Header */}
-      <div className={`${column.bgColor} px-8 py-7 text-white relative overflow-hidden`}>
-        {/* Background Pattern */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent"></div>
-          <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
-          <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full translate-y-12 -translate-x-12"></div>
-        </div>
-        
+      <div className={`${column.bgColor} px-6 py-5 text-white relative overflow-hidden`}>
+        <div className="absolute inset-0 bg-black bg-opacity-10"></div>
         <div className="relative z-10">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center space-x-4">
-              <div className="p-3 bg-white/20 backdrop-blur-sm rounded-2xl shadow-lg group-hover:scale-110 transition-transform duration-300">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center space-x-3">
+              <div className="p-2 bg-white bg-opacity-20 rounded-lg">
                 {column.icon}
               </div>
               <div>
-                <h3 className="text-2xl font-bold mb-1">{column.title}</h3>
-                <p className="text-sm opacity-90 leading-relaxed max-w-sm">{column.description}</p>
+                <h3 className="text-xl font-bold">{column.title}</h3>
+                <p className="text-sm opacity-90">{column.description}</p>
               </div>
             </div>
           </div>
           
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-baseline space-x-2">
-              <span className="text-4xl font-black">{column.clients.length}</span>
+          <div className="flex items-center justify-between">
+            <div>
+              <span className="text-3xl font-bold">{column.clients.length}</span>
               {column.targetCount && (
-                <span className="text-lg opacity-75">/ {column.targetCount}</span>
+                <span className="text-sm opacity-90 ml-2">/ {column.targetCount}</span>
               )}
-              <span className="text-sm opacity-75 ml-2">clientes</span>
             </div>
             <div className="text-right">
-              <div className="text-sm opacity-90 mb-1">Pipeline Total</div>
-              <div className="text-xl font-bold">
+              <div className="text-sm opacity-90">Pipeline</div>
+              <div className="text-lg font-semibold">
                 {new Intl.NumberFormat('pt-BR', {
                   style: 'currency',
                   currency: 'BRL',
@@ -707,22 +597,16 @@ function StageColumn({ column, onClientSelect, selectedClientId }: StageColumnPr
           </div>
           
           {column.targetCount && (
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm opacity-90">
-                <span className="font-medium">Meta de Clientes</span>
-                <span className="font-bold">{Math.round(progressPercentage)}%</span>
+            <div className="mt-3">
+              <div className="flex justify-between text-xs opacity-90 mb-1">
+                <span>Progresso da meta</span>
+                <span>{Math.round(progressPercentage)}%</span>
               </div>
-              <div className="w-full bg-white/20 rounded-full h-3 shadow-inner">
+              <div className="w-full bg-white bg-opacity-20 rounded-full h-2">
                 <div 
-                  className="bg-white rounded-full h-3 transition-all duration-1000 ease-out shadow-lg relative overflow-hidden"
+                  className="bg-white rounded-full h-2 transition-all duration-500"
                   style={{ width: `${Math.min(progressPercentage, 100)}%` }}
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-pulse"></div>
-                </div>
-              </div>
-              <div className="flex justify-between text-xs opacity-75">
-                <span>0</span>
-                <span>{column.targetCount}</span>
+                />
               </div>
             </div>
           )}
@@ -730,31 +614,21 @@ function StageColumn({ column, onClientSelect, selectedClientId }: StageColumnPr
       </div>
 
       {/* Client Cards */}
-      <div className="p-6 space-y-4 max-h-[calc(100vh-450px)] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+      <div className="p-4 space-y-3 max-h-[calc(100vh-400px)] overflow-y-auto">
         {column.clients.length === 0 ? (
-          <div className="text-center py-16 text-gray-500">
-            <div className="relative mb-6">
-              <div className="text-8xl opacity-20 animate-pulse">📋</div>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-16 h-16 border-4 border-dashed border-gray-300 rounded-full animate-spin"></div>
-              </div>
-            </div>
-            <p className="text-xl font-bold mb-2 text-gray-700">Nenhum cliente</p>
-            <p className="text-sm text-gray-500">Aguardando novos leads para esta etapa</p>
+          <div className="text-center py-12 text-gray-500">
+            <div className="text-6xl mb-4 opacity-50">📋</div>
+            <p className="text-lg font-medium mb-2">Nenhum cliente</p>
+            <p className="text-sm">Nesta etapa da jornada</p>
           </div>
         ) : (
-          column.clients.map((client, index) => (
-            <div
+          column.clients.map((client) => (
+            <ClientCard
               key={client.dealId}
-              className="animate-slide-in"
-              style={{ animationDelay: `${index * 100}ms` }}
-            >
-              <ClientCard
-                client={client}
-                isSelected={selectedClientId === client.dealId}
-                onClick={() => onClientSelect(client)}
-              />
-            </div>
+              client={client}
+              isSelected={selectedClientId === client.dealId}
+              onClick={() => onClientSelect(client)}
+            />
           ))
         )}
       </div>
@@ -789,117 +663,98 @@ function ClientCard({ client, isSelected, onClick }: ClientCardProps) {
   };
 
   const getHealthScoreColor = (score: number) => {
-    if (score >= 90) return 'text-emerald-700 bg-emerald-50 border-emerald-200 ring-emerald-100';
-    if (score >= 70) return 'text-blue-700 bg-blue-50 border-blue-200 ring-blue-100';
-    if (score >= 50) return 'text-amber-700 bg-amber-50 border-amber-200 ring-amber-100';
-    return 'text-red-700 bg-red-50 border-red-200 ring-red-100';
+    if (score >= 90) return 'text-green-600 bg-green-100';
+    if (score >= 70) return 'text-blue-600 bg-blue-100';
+    if (score >= 50) return 'text-yellow-600 bg-yellow-100';
+    return 'text-red-600 bg-red-100';
   };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'high': return 'bg-gradient-to-r from-red-500 to-pink-500 shadow-red-200';
-      case 'medium': return 'bg-gradient-to-r from-yellow-400 to-orange-500 shadow-yellow-200';
-      case 'low': return 'bg-gradient-to-r from-green-400 to-emerald-500 shadow-green-200';
-      default: return 'bg-gradient-to-r from-gray-400 to-gray-500 shadow-gray-200';
+      case 'high': return 'bg-red-500';
+      case 'medium': return 'bg-yellow-500';
+      case 'low': return 'bg-green-500';
+      default: return 'bg-gray-500';
     }
   };
 
   return (
     <div 
       onClick={onClick}
-      className={`group relative p-5 rounded-2xl border-2 cursor-pointer transition-all duration-300 hover:shadow-2xl hover:scale-105 transform ${
+      className={`group p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 hover:shadow-lg hover:scale-[1.02] ${
         isSelected 
-          ? 'border-blue-500 bg-gradient-to-br from-blue-50 to-indigo-50 shadow-2xl ring-4 ring-blue-200/50 scale-105' 
-          : 'border-gray-200/50 bg-white/80 backdrop-blur-sm hover:border-blue-300 hover:bg-white'
+          ? 'border-blue-500 bg-blue-50 shadow-lg ring-2 ring-blue-200' 
+          : 'border-gray-200 bg-white hover:border-gray-300'
       }`}
     >
-      {/* Selection Indicator */}
-      {isSelected && (
-        <div className="absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full flex items-center justify-center shadow-lg animate-pulse">
-          <Zap className="h-3 w-3 text-white" />
-        </div>
-      )}
-
       {/* Header */}
-      <div className="flex items-start justify-between mb-4">
+      <div className="flex items-start justify-between mb-3">
         <div className="flex items-center space-x-3 min-w-0 flex-1">
           <div className="relative">
-            <div className="w-12 h-12 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow duration-300">
-              <User className="h-6 w-6 text-gray-600" />
+            <div className="w-10 h-10 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center">
+              <User className="h-5 w-5 text-gray-600" />
             </div>
-            <div className={`absolute -top-1 -right-1 w-4 h-4 rounded-full shadow-lg ${getPriorityColor(client.journeyPosition.priority)}`}></div>
+            <div className={`absolute -top-1 -right-1 w-3 h-3 rounded-full ${getPriorityColor(client.journeyPosition.priority)}`}></div>
           </div>
           <div className="min-w-0 flex-1">
-            <h4 className="font-bold text-gray-900 truncate text-lg group-hover:text-blue-700 transition-colors">
+            <h4 className="font-semibold text-gray-900 truncate">
               {client.contact.properties.firstname} {client.contact.properties.lastname}
             </h4>
-            <p className="text-sm text-gray-600 truncate font-medium">{client.contact.properties.company}</p>
-            <p className="text-xs text-gray-500 truncate">{client.contact.properties.job_title}</p>
+            <p className="text-sm text-gray-600 truncate">{client.contact.properties.company}</p>
           </div>
         </div>
         
         <div className="flex items-center space-x-2">
-          <div className={`px-3 py-1.5 rounded-xl text-sm font-bold border ${getHealthScoreColor(client.healthScore)} shadow-sm`}>
+          <div className={`px-2 py-1 rounded-full text-xs font-medium ${getHealthScoreColor(client.healthScore)}`}>
             {client.healthScore}
           </div>
-          <button className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-all duration-200 opacity-0 group-hover:opacity-100">
-            <MoreVertical className="h-4 w-4" />
-          </button>
+          <MoreVertical className="h-4 w-4 text-gray-400 group-hover:text-gray-600" />
         </div>
       </div>
 
       {/* Deal Amount */}
-      <div className="mb-4 p-3 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-green-200/50">
-        <div className="text-2xl font-black text-green-700 mb-1">
+      <div className="mb-3">
+        <div className="text-lg font-bold text-green-600">
           {formatCurrency(client.deal.properties.amount || '0')}
         </div>
-        <div className="text-xs text-green-600 font-semibold capitalize">
-          {client.deal.properties.dealtype?.replace(/([A-Z])/g, ' $1').trim()} • {client.deal.properties.investment_type}
+        <div className="text-xs text-gray-500 capitalize">
+          {client.deal.properties.dealtype?.replace(/([A-Z])/g, ' $1').trim()}
         </div>
       </div>
 
-      {/* Journey Progress */}
-      <div className="space-y-3 mb-4">
+      {/* Journey Info */}
+      <div className="space-y-2 mb-3">
         <div className="flex items-center justify-between">
-          <span className="text-sm font-bold text-gray-700 capitalize">
+          <span className="text-xs font-medium text-gray-700">
             {client.journeyPosition.subStage.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
           </span>
-          <span className="text-sm font-bold text-blue-600 bg-blue-100 px-2 py-1 rounded-lg">
+          <span className="text-xs text-gray-500">
             {Math.round(client.journeyPosition.confidence * 100)}%
           </span>
         </div>
-        <div className="w-full bg-gray-200 rounded-full h-2.5 shadow-inner">
+        <div className="w-full bg-gray-200 rounded-full h-1.5">
           <div 
-            className="bg-gradient-to-r from-blue-500 via-purple-500 to-green-500 h-2.5 rounded-full transition-all duration-1000 ease-out shadow-lg relative overflow-hidden"
+            className="bg-gradient-to-r from-blue-500 to-green-500 h-1.5 rounded-full transition-all duration-500"
             style={{ width: `${client.journeyPosition.confidence * 100}%` }}
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent animate-pulse"></div>
-          </div>
+          />
         </div>
       </div>
 
       {/* Footer */}
-      <div className="flex items-center justify-between text-xs text-gray-500 pt-3 border-t border-gray-200/50">
-        <div className="flex items-center space-x-2">
+      <div className="flex items-center justify-between text-xs text-gray-500">
+        <div className="flex items-center space-x-1">
           <Calendar className="h-3 w-3" />
-          <span className="font-medium">{formatDate(client.journeyPosition.lastUpdated)}</span>
+          <span>{formatDate(client.journeyPosition.lastUpdated)}</span>
         </div>
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-2">
           {client.journeyPosition.metadata.whatsappCadenceActive && (
-            <div className="flex items-center space-x-1 text-green-600">
-              <MessageSquare className="h-3 w-3" />
-              <span className="text-xs font-semibold">WhatsApp</span>
-            </div>
+            <MessageSquare className="h-3 w-3 text-green-500" />
           )}
           {client.journeyPosition.metadata.riskFactors.length > 0 && (
-            <div className="flex items-center space-x-1 text-red-600">
-              <AlertCircle className="h-3 w-3 animate-pulse" />
-              <span className="text-xs font-semibold">Risco</span>
-            </div>
+            <AlertCircle className="h-3 w-3 text-red-500" />
           )}
           <div className="text-right">
-            <div className="font-bold text-gray-700">{client.journeyPosition.daysInCurrentStage}d</div>
-            <div className="text-xs text-gray-500">na etapa</div>
+            <div>{client.journeyPosition.daysInCurrentStage}d</div>
           </div>
         </div>
       </div>
@@ -926,98 +781,84 @@ function ClientListView({ clients, onClientSelect, selectedClientId }: ClientLis
   };
 
   const getHealthScoreColor = (score: number) => {
-    if (score >= 90) return 'text-emerald-700 bg-emerald-100 border-emerald-200';
-    if (score >= 70) return 'text-blue-700 bg-blue-100 border-blue-200';
-    if (score >= 50) return 'text-amber-700 bg-amber-100 border-amber-200';
-    return 'text-red-700 bg-red-100 border-red-200';
+    if (score >= 90) return 'text-green-600 bg-green-100';
+    if (score >= 70) return 'text-blue-600 bg-blue-100';
+    if (score >= 50) return 'text-yellow-600 bg-yellow-100';
+    return 'text-red-600 bg-red-100';
   };
 
   const getStageColor = (stage: JourneyStage) => {
     switch (stage) {
-      case 'prospeccao': return 'bg-blue-100 text-blue-800 border-blue-200';
-      case 'onboarding': return 'bg-amber-100 text-amber-800 border-amber-200';
-      case 'relacionamento': return 'bg-emerald-100 text-emerald-800 border-emerald-200';
-      default: return 'bg-gray-100 text-gray-800 border-gray-200';
+      case 'prospeccao': return 'bg-blue-100 text-blue-800';
+      case 'onboarding': return 'bg-amber-100 text-amber-800';
+      case 'relacionamento': return 'bg-emerald-100 text-emerald-800';
+      default: return 'bg-gray-100 text-gray-800';
     }
   };
 
   return (
-    <div className="bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl overflow-hidden border border-white/20">
-      <div className="px-8 py-6 border-b border-gray-200/50 bg-gradient-to-r from-gray-50 to-blue-50">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-1">Lista de Clientes</h2>
-            <p className="text-gray-600">Visualização detalhada de todos os clientes</p>
-          </div>
-          <div className="flex items-center space-x-2">
-            <div className="px-4 py-2 bg-blue-100 text-blue-800 rounded-xl font-semibold text-sm">
-              {clients.length} clientes
-            </div>
-          </div>
-        </div>
+    <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+      <div className="px-6 py-4 border-b border-gray-200">
+        <h2 className="text-lg font-semibold text-gray-900">Lista de Clientes</h2>
       </div>
       
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200/50">
-          <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
             <tr>
-              <th className="px-8 py-4 text-left text-sm font-bold text-gray-700 uppercase tracking-wider">Cliente</th>
-              <th className="px-6 py-4 text-left text-sm font-bold text-gray-700 uppercase tracking-wider">Etapa</th>
-              <th className="px-6 py-4 text-left text-sm font-bold text-gray-700 uppercase tracking-wider">Valor</th>
-              <th className="px-6 py-4 text-left text-sm font-bold text-gray-700 uppercase tracking-wider">Saúde</th>
-              <th className="px-6 py-4 text-left text-sm font-bold text-gray-700 uppercase tracking-wider">Assessor</th>
-              <th className="px-6 py-4 text-left text-sm font-bold text-gray-700 uppercase tracking-wider">Ações</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cliente</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Etapa</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Valor</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Saúde</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Assessor</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200/30">
-            {clients.map((client, index) => (
+          <tbody className="bg-white divide-y divide-gray-200">
+            {clients.map((client) => (
               <tr 
                 key={client.dealId}
-                className={`hover:bg-blue-50/50 cursor-pointer transition-all duration-300 ${
-                  selectedClientId === client.dealId ? 'bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 border-blue-500 shadow-lg' : ''
-                } animate-slide-in`}
-                style={{ animationDelay: `${index * 50}ms` }}
+                className={`hover:bg-gray-50 cursor-pointer ${
+                  selectedClientId === client.dealId ? 'bg-blue-50 border-l-4 border-blue-500' : ''
+                }`}
                 onClick={() => onClientSelect(client)}
               >
-                <td className="px-8 py-6 whitespace-nowrap">
+                <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center">
-                    <div className="w-12 h-12 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl flex items-center justify-center shadow-lg">
-                      <User className="h-6 w-6 text-gray-600" />
+                    <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
+                      <User className="h-5 w-5 text-gray-600" />
                     </div>
                     <div className="ml-4">
-                      <div className="text-lg font-bold text-gray-900">
+                      <div className="text-sm font-medium text-gray-900">
                         {client.contact.properties.firstname} {client.contact.properties.lastname}
                       </div>
-                      <div className="text-sm text-gray-600 font-medium">{client.contact.properties.company}</div>
-                      <div className="text-xs text-gray-500">{client.contact.properties.job_title}</div>
+                      <div className="text-sm text-gray-500">{client.contact.properties.company}</div>
                     </div>
                   </div>
                 </td>
-                <td className="px-6 py-6 whitespace-nowrap">
-                  <span className={`inline-flex px-3 py-2 text-sm font-bold rounded-xl border ${getStageColor(client.journeyPosition.stage)}`}>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStageColor(client.journeyPosition.stage)}`}>
                     {client.journeyPosition.stage.charAt(0).toUpperCase() + client.journeyPosition.stage.slice(1)}
                   </span>
                 </td>
-                <td className="px-6 py-6 whitespace-nowrap text-lg font-black text-green-700">
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600">
                   {formatCurrency(client.deal.properties.amount || '0')}
                 </td>
-                <td className="px-6 py-6 whitespace-nowrap">
-                  <span className={`inline-flex px-3 py-2 text-sm font-bold rounded-xl border ${getHealthScoreColor(client.healthScore)}`}>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getHealthScoreColor(client.healthScore)}`}>
                     {client.healthScore}
                   </span>
                 </td>
-                <td className="px-6 py-6 whitespace-nowrap text-sm font-medium text-gray-900">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                   {client.ownerName}
                 </td>
-                <td className="px-6 py-6 whitespace-nowrap text-sm font-medium">
-                  <div className="flex items-center space-x-3">
-                    <button className="text-blue-600 hover:text-blue-900 hover:bg-blue-100 p-2 rounded-lg transition-all duration-200">
-                      <Eye className="h-4 w-4" />
-                    </button>
-                    <button className="text-gray-600 hover:text-gray-900 hover:bg-gray-100 p-2 rounded-lg transition-all duration-200">
-                      <Edit className="h-4 w-4" />
-                    </button>
-                  </div>
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                  <button className="text-blue-600 hover:text-blue-900 mr-3">
+                    <Eye className="h-4 w-4" />
+                  </button>
+                  <button className="text-gray-600 hover:text-gray-900">
+                    <Edit className="h-4 w-4" />
+                  </button>
                 </td>
               </tr>
             ))}
@@ -1052,44 +893,38 @@ function ClientDetailModal({ client, onClose }: ClientDetailModalProps) {
   };
 
   const getHealthScoreColor = (score: number) => {
-    if (score >= 90) return 'text-emerald-700 bg-emerald-50 border-emerald-200';
-    if (score >= 70) return 'text-blue-700 bg-blue-50 border-blue-200';
-    if (score >= 50) return 'text-amber-700 bg-amber-50 border-amber-200';
-    return 'text-red-700 bg-red-50 border-red-200';
+    if (score >= 90) return 'text-green-600 bg-green-100 border-green-200';
+    if (score >= 70) return 'text-blue-600 bg-blue-100 border-blue-200';
+    if (score >= 50) return 'text-yellow-600 bg-yellow-100 border-yellow-200';
+    return 'text-red-600 bg-red-100 border-red-200';
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
-      <div className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl max-w-5xl w-full max-h-[95vh] overflow-hidden border border-white/20 animate-slide-up">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
         {/* Header */}
-        <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-700 px-8 py-8 text-white relative overflow-hidden">
-          {/* Background Pattern */}
-          <div className="absolute inset-0 opacity-20">
-            <div className="absolute top-0 right-0 w-40 h-40 bg-white rounded-full -translate-y-20 translate-x-20"></div>
-            <div className="absolute bottom-0 left-0 w-32 h-32 bg-white rounded-full translate-y-16 -translate-x-16"></div>
-          </div>
-          
-          <div className="relative z-10 flex items-center justify-between">
-            <div className="flex items-center space-x-6">
-              <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-3xl flex items-center justify-center shadow-xl">
-                <User className="h-8 w-8" />
+        <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-6 text-white">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <div className="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                <User className="h-6 w-6" />
               </div>
               <div>
-                <h2 className="text-3xl font-black mb-2">
+                <h2 className="text-2xl font-bold">
                   {client.contact.properties.firstname} {client.contact.properties.lastname}
                 </h2>
-                <p className="text-blue-100 text-lg font-medium mb-1">{client.contact.properties.company}</p>
-                <p className="text-sm text-blue-200">{client.contact.properties.job_title} • {client.contact.properties.city}</p>
+                <p className="text-blue-100">{client.contact.properties.company}</p>
+                <p className="text-sm text-blue-200">{client.contact.properties.job_title}</p>
               </div>
             </div>
             <div className="flex items-center space-x-4">
-              <div className={`px-4 py-3 rounded-2xl border-2 ${getHealthScoreColor(client.healthScore)} shadow-lg`}>
-                <div className="text-sm font-bold mb-1">Health Score</div>
-                <div className="text-3xl font-black">{client.healthScore}</div>
+              <div className={`px-3 py-2 rounded-lg border ${getHealthScoreColor(client.healthScore)}`}>
+                <div className="text-sm font-medium">Health Score</div>
+                <div className="text-2xl font-bold">{client.healthScore}</div>
               </div>
               <button 
                 onClick={onClose}
-                className="text-white hover:text-gray-200 text-3xl font-bold p-3 hover:bg-white/10 rounded-2xl transition-all duration-300 hover:scale-110"
+                className="text-white hover:text-gray-200 text-2xl font-bold p-2 hover:bg-white hover:bg-opacity-10 rounded-full"
               >
                 ×
               </button>
@@ -1098,172 +933,156 @@ function ClientDetailModal({ client, onClose }: ClientDetailModalProps) {
         </div>
 
         {/* Content */}
-        <div className="p-8 overflow-y-auto max-h-[calc(95vh-200px)] space-y-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="p-6 overflow-y-auto max-h-[calc(90vh-200px)]">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Journey Position */}
-            <div className="bg-gradient-to-br from-gray-50 to-blue-50 rounded-3xl p-8 border border-gray-200/50 shadow-lg">
-              <h3 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
-                <div className="p-3 bg-blue-600 rounded-2xl mr-4 shadow-lg">
-                  <Target className="h-6 w-6 text-white" />
-                </div>
+            <div className="bg-gray-50 rounded-xl p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <Target className="h-5 w-5 mr-2 text-blue-600" />
                 Posição na Jornada
               </h3>
               
-              <div className="space-y-6">
-                <div className="bg-white rounded-2xl p-6 border border-gray-200/50 shadow-lg">
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="font-bold text-gray-900 text-xl capitalize">
+              <div className="space-y-4">
+                <div className="bg-white rounded-lg p-4 border">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-medium text-gray-900 capitalize">
                       {client.journeyPosition.stage}
                     </span>
-                    <span className="text-sm bg-blue-600 text-white px-4 py-2 rounded-xl font-bold shadow-lg">
+                    <span className="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
                       {Math.round(client.journeyPosition.confidence * 100)}% confiança
                     </span>
                   </div>
-                  <p className="text-gray-600 mb-4 capitalize font-medium">
+                  <p className="text-sm text-gray-600 mb-3 capitalize">
                     {client.journeyPosition.subStage.replace(/_/g, ' ')}
                   </p>
-                  <div className="w-full bg-gray-200 rounded-full h-3 shadow-inner">
+                  <div className="w-full bg-gray-200 rounded-full h-2">
                     <div 
-                      className="bg-gradient-to-r from-blue-500 to-green-500 h-3 rounded-full transition-all duration-1000 shadow-lg"
+                      className="bg-gradient-to-r from-blue-500 to-green-500 h-2 rounded-full"
                       style={{ width: `${client.journeyPosition.confidence * 100}%` }}
                     />
                   </div>
                 </div>
                 
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="text-center p-6 bg-white rounded-2xl border border-gray-200/50 shadow-lg hover:shadow-xl transition-shadow">
-                    <div className="text-4xl font-black text-gray-900 mb-2">{client.journeyPosition.daysInCurrentStage}</div>
-                    <div className="text-sm text-gray-600 font-medium">Dias na etapa</div>
+                  <div className="text-center p-3 bg-white rounded-lg border">
+                    <div className="text-2xl font-bold text-gray-900">{client.journeyPosition.daysInCurrentStage}</div>
+                    <div className="text-sm text-gray-500">Dias na etapa</div>
                   </div>
-                  <div className="text-center p-6 bg-white rounded-2xl border border-gray-200/50 shadow-lg hover:shadow-xl transition-shadow">
-                    <div className="text-4xl font-black text-blue-600 mb-2">{client.journeyPosition.priority.toUpperCase()}</div>
-                    <div className="text-sm text-gray-600 font-medium">Prioridade</div>
+                  <div className="text-center p-3 bg-white rounded-lg border">
+                    <div className="text-2xl font-bold text-blue-600">{client.journeyPosition.priority.toUpperCase()}</div>
+                    <div className="text-sm text-gray-500">Prioridade</div>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Contact Information */}
-            <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-3xl p-8 border border-green-200/50 shadow-lg">
-              <h3 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
-                <div className="p-3 bg-green-600 rounded-2xl mr-4 shadow-lg">
-                  <User className="h-6 w-6 text-white" />
-                </div>
+            <div className="bg-gray-50 rounded-xl p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <User className="h-5 w-5 mr-2 text-blue-600" />
                 Informações de Contato
               </h3>
               
-              <div className="space-y-4">
-                <div className="flex items-center space-x-4 p-4 bg-white rounded-2xl border border-green-200/50 shadow-lg hover:shadow-xl transition-shadow">
-                  <div className="p-3 bg-green-100 rounded-xl">
-                    <Mail className="h-5 w-5 text-green-600" />
-                  </div>
-                  <span className="text-gray-700 font-medium">{client.contact.properties.email}</span>
+              <div className="space-y-3">
+                <div className="flex items-center space-x-3 p-3 bg-white rounded-lg border">
+                  <Mail className="h-5 w-5 text-gray-400" />
+                  <span className="text-gray-700">{client.contact.properties.email}</span>
                 </div>
                 {client.contact.properties.phone && (
-                  <div className="flex items-center space-x-4 p-4 bg-white rounded-2xl border border-green-200/50 shadow-lg hover:shadow-xl transition-shadow">
-                    <div className="p-3 bg-green-100 rounded-xl">
-                      <Phone className="h-5 w-5 text-green-600" />
-                    </div>
-                    <span className="text-gray-700 font-medium">{client.contact.properties.phone}</span>
+                  <div className="flex items-center space-x-3 p-3 bg-white rounded-lg border">
+                    <Phone className="h-5 w-5 text-gray-400" />
+                    <span className="text-gray-700">{client.contact.properties.phone}</span>
                   </div>
                 )}
-                <div className="flex items-center space-x-4 p-4 bg-white rounded-2xl border border-green-200/50 shadow-lg hover:shadow-xl transition-shadow">
-                  <div className="p-3 bg-green-100 rounded-xl">
-                    <Building2 className="h-5 w-5 text-green-600" />
-                  </div>
-                  <span className="text-gray-700 font-medium">{client.contact.properties.company}</span>
+                <div className="flex items-center space-x-3 p-3 bg-white rounded-lg border">
+                  <Building2 className="h-5 w-5 text-gray-400" />
+                  <span className="text-gray-700">{client.contact.properties.company}</span>
                 </div>
                 {client.contact.properties.city && (
-                  <div className="flex items-center space-x-4 p-4 bg-white rounded-2xl border border-green-200/50 shadow-lg hover:shadow-xl transition-shadow">
-                    <div className="p-3 bg-green-100 rounded-xl">
-                      <span className="text-green-600 text-lg">📍</span>
-                    </div>
-                    <span className="text-gray-700 font-medium">{client.contact.properties.city}</span>
+                  <div className="flex items-center space-x-3 p-3 bg-white rounded-lg border">
+                    <span className="text-gray-400">📍</span>
+                    <span className="text-gray-700">{client.contact.properties.city}</span>
                   </div>
                 )}
               </div>
             </div>
 
             {/* Deal Information */}
-            <div className="bg-gradient-to-br from-emerald-50 to-green-50 rounded-3xl p-8 border border-emerald-200/50 shadow-lg">
-              <h3 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
-                <div className="p-3 bg-emerald-600 rounded-2xl mr-4 shadow-lg">
-                  <DollarSign className="h-6 w-6 text-white" />
-                </div>
+            <div className="bg-gray-50 rounded-xl p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <DollarSign className="h-5 w-5 mr-2 text-green-600" />
                 Informações do Negócio
               </h3>
               
-              <div className="space-y-4">
-                <div className="p-6 bg-white rounded-2xl border border-emerald-200/50 shadow-lg hover:shadow-xl transition-shadow">
-                  <div className="text-sm text-gray-600 font-medium mb-2">Valor do Deal</div>
-                  <div className="text-4xl font-black text-emerald-600">
+              <div className="space-y-3">
+                <div className="p-4 bg-white rounded-lg border">
+                  <div className="text-sm text-gray-500">Valor do Deal</div>
+                  <div className="text-2xl font-bold text-green-600">
                     {formatCurrency(client.deal.properties.amount || '0')}
                   </div>
                 </div>
                 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="p-4 bg-white rounded-2xl border border-emerald-200/50 shadow-lg hover:shadow-xl transition-shadow">
-                    <div className="text-sm text-gray-600 font-medium mb-2">Status</div>
-                    <div className="font-bold capitalize text-gray-900">
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="p-3 bg-white rounded-lg border">
+                    <div className="text-sm text-gray-500">Status</div>
+                    <div className="font-medium capitalize">
                       {client.deal.properties.dealstage.replace(/([A-Z])/g, ' $1').trim()}
                     </div>
                   </div>
-                  <div className="p-4 bg-white rounded-2xl border border-emerald-200/50 shadow-lg hover:shadow-xl transition-shadow">
-                    <div className="text-sm text-gray-600 font-medium mb-2">Tipo</div>
-                    <div className="font-bold capitalize text-gray-900">
+                  <div className="p-3 bg-white rounded-lg border">
+                    <div className="text-sm text-gray-500">Tipo</div>
+                    <div className="font-medium capitalize">
                       {client.deal.properties.dealtype}
                     </div>
                   </div>
                 </div>
                 
                 {client.deal.properties.closedate && (
-                  <div className="p-4 bg-white rounded-2xl border border-emerald-200/50 shadow-lg hover:shadow-xl transition-shadow">
-                    <div className="text-sm text-gray-600 font-medium mb-2">Data de Fechamento</div>
-                    <div className="font-bold text-gray-900">{formatDate(client.deal.properties.closedate)}</div>
+                  <div className="p-3 bg-white rounded-lg border">
+                    <div className="text-sm text-gray-500">Data de Fechamento</div>
+                    <div className="font-medium">{formatDate(client.deal.properties.closedate)}</div>
                   </div>
                 )}
               </div>
             </div>
 
             {/* Journey Metadata */}
-            <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-3xl p-8 border border-purple-200/50 shadow-lg">
-              <h3 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
-                <div className="p-3 bg-purple-600 rounded-2xl mr-4 shadow-lg">
-                  <Activity className="h-6 w-6 text-white" />
-                </div>
+            <div className="bg-gray-50 rounded-xl p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <Activity className="h-5 w-5 mr-2 text-purple-600" />
                 Detalhes da Jornada
               </h3>
               
-              <div className="space-y-6">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="p-4 bg-white rounded-2xl border border-purple-200/50 shadow-lg text-center hover:shadow-xl transition-shadow">
-                    <div className="text-sm text-gray-600 font-medium mb-2">Proposta Enviada</div>
-                    <div className="text-3xl">
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="p-3 bg-white rounded-lg border text-center">
+                    <div className="text-sm text-gray-500">Proposta Enviada</div>
+                    <div className="text-lg">
                       {client.journeyPosition.metadata.proposalSent ? '✅' : '❌'}
                     </div>
                   </div>
-                  <div className="p-4 bg-white rounded-2xl border border-purple-200/50 shadow-lg text-center hover:shadow-xl transition-shadow">
-                    <div className="text-sm text-gray-600 font-medium mb-2">Cadência WhatsApp</div>
-                    <div className="text-3xl">
+                  <div className="p-3 bg-white rounded-lg border text-center">
+                    <div className="text-sm text-gray-500">Cadência WhatsApp</div>
+                    <div className="text-lg">
                       {client.journeyPosition.metadata.whatsappCadenceActive ? '✅' : '❌'}
                     </div>
                   </div>
                 </div>
                 
                 {client.journeyPosition.metadata.firstDepositDate && (
-                  <div className="p-4 bg-white rounded-2xl border border-purple-200/50 shadow-lg hover:shadow-xl transition-shadow">
-                    <div className="text-sm text-gray-600 font-medium mb-2">Primeiro Depósito</div>
-                    <div className="font-bold text-gray-900">{formatDate(client.journeyPosition.metadata.firstDepositDate)}</div>
+                  <div className="p-3 bg-white rounded-lg border">
+                    <div className="text-sm text-gray-500">Primeiro Depósito</div>
+                    <div className="font-medium">{formatDate(client.journeyPosition.metadata.firstDepositDate)}</div>
                   </div>
                 )}
                 
                 {client.journeyPosition.metadata.lastMeetingDate && (
-                  <div className="p-4 bg-white rounded-2xl border border-purple-200/50 shadow-lg hover:shadow-xl transition-shadow">
-                    <div className="text-sm text-gray-600 font-medium mb-2">Última Reunião</div>
-                    <div className="font-bold text-gray-900">
+                  <div className="p-3 bg-white rounded-lg border">
+                    <div className="text-sm text-gray-500">Última Reunião</div>
+                    <div className="font-medium">
                       {formatDate(client.journeyPosition.metadata.lastMeetingDate)}
                       {client.journeyPosition.metadata.daysSinceLastMeeting && 
-                        <span className="text-gray-500 text-sm ml-2 font-normal">
+                        <span className="text-gray-500 text-sm ml-2">
                           ({client.journeyPosition.metadata.daysSinceLastMeeting} dias atrás)
                         </span>
                       }
@@ -1273,13 +1092,13 @@ function ClientDetailModal({ client, onClose }: ClientDetailModalProps) {
 
                 {/* Next Actions */}
                 {client.journeyPosition.metadata.nextActions.length > 0 && (
-                  <div className="p-4 bg-white rounded-2xl border border-purple-200/50 shadow-lg hover:shadow-xl transition-shadow">
-                    <div className="text-sm text-gray-600 font-medium mb-3">Próximas Ações</div>
-                    <ul className="space-y-2">
+                  <div className="p-3 bg-white rounded-lg border">
+                    <div className="text-sm text-gray-500 mb-2">Próximas Ações</div>
+                    <ul className="space-y-1">
                       {client.journeyPosition.metadata.nextActions.map((action, index) => (
-                        <li key={index} className="text-sm flex items-center font-medium">
-                          <ArrowRight className="h-4 w-4 text-purple-500 mr-3 flex-shrink-0" />
-                          <span className="text-gray-700">{action}</span>
+                        <li key={index} className="text-sm flex items-center">
+                          <ArrowRight className="h-3 w-3 text-blue-500 mr-2" />
+                          {action}
                         </li>
                       ))}
                     </ul>
@@ -1288,14 +1107,14 @@ function ClientDetailModal({ client, onClose }: ClientDetailModalProps) {
 
                 {/* Risk Factors */}
                 {client.journeyPosition.metadata.riskFactors.length > 0 && (
-                  <div className="p-4 bg-red-50 rounded-2xl border-2 border-red-200 shadow-lg">
-                    <div className="text-sm text-red-700 mb-3 flex items-center font-bold">
-                      <AlertCircle className="h-5 w-5 mr-2" />
+                  <div className="p-3 bg-red-50 rounded-lg border border-red-200">
+                    <div className="text-sm text-red-600 mb-2 flex items-center">
+                      <AlertCircle className="h-4 w-4 mr-1" />
                       Fatores de Risco
                     </div>
-                    <ul className="space-y-2">
+                    <ul className="space-y-1">
                       {client.journeyPosition.metadata.riskFactors.map((risk, index) => (
-                        <li key={index} className="text-sm text-red-700 font-medium">
+                        <li key={index} className="text-sm text-red-700">
                           • {risk}
                         </li>
                       ))}
@@ -1308,27 +1127,21 @@ function ClientDetailModal({ client, onClose }: ClientDetailModalProps) {
 
           {/* Owner Information */}
           {client.ownerName && (
-            <div className="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-3xl p-8 border border-yellow-200/50 shadow-lg">
-              <h3 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
-                <div className="p-3 bg-yellow-500 rounded-2xl mr-4 shadow-lg">
-                  <Star className="h-6 w-6 text-white" />
-                </div>
+            <div className="mt-6 bg-gray-50 rounded-xl p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <Star className="h-5 w-5 mr-2 text-yellow-600" />
                 Informações do Assessor
               </h3>
-              <div className="bg-white rounded-2xl p-6 border border-yellow-200/50 shadow-lg hover:shadow-xl transition-shadow">
-                <div className="flex items-center space-x-4">
-                  <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-3xl flex items-center justify-center shadow-lg">
-                    <span className="text-white font-bold text-xl">
+              <div className="bg-white rounded-lg p-4 border">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                    <span className="text-white font-medium text-sm">
                       {client.ownerName.split(' ').map(n => n[0]).join('').toUpperCase()}
                     </span>
                   </div>
                   <div>
-                    <div className="font-bold text-gray-900 text-xl">{client.ownerName}</div>
-                    <div className="text-gray-600 font-medium">Assessor Responsável</div>
-                    <div className="flex items-center space-x-2 mt-2">
-                      <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
-                      <span className="text-sm text-green-600 font-medium">Ativo</span>
-                    </div>
+                    <div className="font-medium text-gray-900">{client.ownerName}</div>
+                    <div className="text-sm text-gray-500">Assessor Responsável</div>
                   </div>
                 </div>
               </div>
@@ -1337,89 +1150,20 @@ function ClientDetailModal({ client, onClose }: ClientDetailModalProps) {
         </div>
 
         {/* Footer */}
-        <div className="bg-gradient-to-r from-gray-50 to-blue-50 px-8 py-6 flex items-center justify-between border-t border-gray-200/50">
-          <div className="text-sm text-gray-600 font-medium">
-            <div className="flex items-center space-x-2">
-              <Clock className="h-4 w-4" />
-              <span>Última atualização: {formatDate(client.journeyPosition.lastUpdated)}</span>
-            </div>
+        <div className="bg-gray-50 px-6 py-4 flex items-center justify-between border-t">
+          <div className="text-sm text-gray-500">
+            Última atualização: {formatDate(client.journeyPosition.lastUpdated)}
           </div>
-          <div className="flex items-center space-x-4">
-            <button className="px-6 py-3 text-sm bg-white border-2 border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all duration-300 font-medium shadow-lg hover:shadow-xl hover:scale-105">
+          <div className="flex items-center space-x-3">
+            <button className="px-4 py-2 text-sm bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
               Editar Cliente
             </button>
-            <button className="px-6 py-3 text-sm bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 font-medium shadow-lg hover:shadow-xl hover:scale-105">
+            <button className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
               Agendar Reunião
             </button>
           </div>
         </div>
       </div>
-
-      {/* Custom Styles for animations */}
-      <style jsx>{`
-        @keyframes slide-up {
-          from {
-            opacity: 0;
-            transform: translateY(50px) scale(0.95);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-          }
-        }
-        
-        @keyframes slide-in {
-          from {
-            opacity: 0;
-            transform: translateX(-20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateX(0);
-          }
-        }
-        
-        .animate-slide-up {
-          animation: slide-up 0.4s ease-out forwards;
-        }
-        
-        .animate-slide-in {
-          animation: slide-in 0.4s ease-out forwards;
-          opacity: 0;
-        }
-
-        /* Custom scrollbar */
-        .scrollbar-thin {
-          scrollbar-width: thin;
-        }
-        
-        .scrollbar-thumb-gray-300 {
-          scrollbar-color: #d1d5db transparent;
-        }
-        
-        .scrollbar-track-gray-100 {
-          scrollbar-track-color: #f3f4f6;
-        }
-        
-        /* Webkit scrollbar for better browser support */
-        .scrollbar-thin::-webkit-scrollbar {
-          width: 6px;
-        }
-        
-        .scrollbar-thin::-webkit-scrollbar-track {
-          background: #f3f4f6;
-          border-radius: 10px;
-        }
-        
-        .scrollbar-thin::-webkit-scrollbar-thumb {
-          background: #d1d5db;
-          border-radius: 10px;
-        }
-        
-        .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-          background: #9ca3af;
-        }
-      `}</style>
     </div>
   );
 }
