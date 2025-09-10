@@ -5,21 +5,21 @@
 @layer base {
   html {
     font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   }
   
   body {
-    @apply antialiased;
+    @apply antialiased bg-gray-50;
   }
 }
 
 @layer components {
   .journey-card {
-    @apply bg-white rounded-lg shadow-sm border border-journey-border p-4 hover:shadow-md transition-all duration-200;
+    @apply bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:shadow-md transition-all duration-200;
   }
   
   .journey-card-selected {
-    @apply border-hubspot-500 bg-hubspot-50 shadow-lg;
+    @apply border-blue-500 bg-blue-50 shadow-lg;
   }
   
   .stage-column {
